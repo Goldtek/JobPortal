@@ -1,4 +1,4 @@
-var express = require('express')
+const express = require('express')
 , path = require('path')
 , favicon = require('serve-favicon')
 , logger = require('morgan')
@@ -86,7 +86,7 @@ app.use('/api', api);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
+  const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
