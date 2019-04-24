@@ -1,4 +1,4 @@
-var User = require('../model/userSchema'),
+const User = require('../model/userSchema'),
     Vendor = require('../model/vendor'),
     Album = require('../model/album'),
     Country = require('../model/countries'),
@@ -22,7 +22,7 @@ var User = require('../model/userSchema'),
 
 function createToken(user){
 
-  var token =  webToken.sign({
+  const token =  webToken.sign({
       name:user.sname+" "+user.fname,
       img:user.profileImg,
        id:user._id
@@ -87,7 +87,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //user login
     api.post('/login',(req,res)=>{
-        var email=clean(req.body.email,res,req),
+        const email=clean(req.body.email,res,req),
         password=clean(req.body.password,res,req);
     
         User.findOne({email:email}).
@@ -106,7 +106,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
             }else{
                 if(bycrpt.compareSync(password,user.pass)){
                    
-                    var token = createToken(user);
+                    const token = createToken(user);
                                             
                     userObj = {
                         _id:user._id,
@@ -151,7 +151,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //signup a user
     api.post('/user/register',(req,res)=>{
-        var fname=clean(req.body.fname,res,req),
+        const fname=clean(req.body.fname,res,req),
             sname=clean(req.body.sname,res,req),
             state=clean(req.body.state,res,req),
             phone=clean(req.body.phone,res,req),
@@ -163,9 +163,9 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
         //saving the record
         if(fname!="" && sname!="" && phone!="" && state!="" && email!="" && country!="" && usertype!="" && pass!="" && city!=""){
-            var hash = bycrpt.hashSync(pass,bycrpt.genSaltSync(10));
+            const hash = bycrpt.hashSync(pass,bycrpt.genSaltSync(10));
 
-                var user = new User({
+                const user = new User({
                         fname:fname,
                         sname:sname,
                         email:email,
@@ -193,7 +193,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
    
     //middlewre to confirm login
     api.use((req,res,next)=>{
-        var token = req.body.token || req.params.token || req.headers['x-access-token'];
+        const token = req.body.token || req.params.token || req.headers['x-access-token'];
        if(token){
          //verify the token
            webToken.verify(token,key,function(err,decoded){
@@ -220,7 +220,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
     api.get('/contacts/:id',(req,res)=>{
       
         //also add and operator for approved==true
-        var id = clean(req.params.id,res,req),
+        const id = clean(req.params.id,res,req),
             users=[];
 
         //getting buddies i added and confirmed
@@ -254,7 +254,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
     //checking if buddy/friend or not
     api.post('/contact',(req,res)=>{
       //also add and operator for approved==true
-        var id = clean(req.params.id,res,req),
+        const id = clean(req.params.id,res,req),
             checkId = clean(req.params.checkId,res,req),
             count = 0,
             users=[];
@@ -301,7 +301,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
    // respond to invitation request
     api.post('/resRequest',(req,res)=>{
-        var answer = clean(req.body.answer,res,req),
+        const answer = clean(req.body.answer,res,req),
             senderid = clean(req.body.senderid,res,req),
             reqid = clean(req.body.reqid,res,req),
             id = clean(req.body.recid,res,req);
@@ -334,7 +334,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //send request/invitation
     api.post('/request',(req,res)=>{
-        var userid= clean(req.body.userid,res,req),
+        const userid= clean(req.body.userid,res,req),
             recid= clean(req.body.recid,res,req),
             
             contact = new Contact({
@@ -357,7 +357,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //change profile image
     api.post('/changeImg/:id',function(req,res){
-        var id= clean(req.params.id,res,req);
+        const id= clean(req.params.id,res,req);
 
          User.findOne({_id:id},function(err,user){
             if(err){
@@ -377,7 +377,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
                    //configuring multer settings
 
                     //multers disk storage settings for profile images
-                    var profile = multer.diskStorage({
+                    const profile = multer.diskStorage({
                         destination: function (req, file, cb) {
                             cb(null, './public/profile');
                         },
@@ -387,7 +387,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
                     });
 
                    //creating a new instance of and passing in the storage settings
-                   var  upload = multer({ //multer settings
+                   const  upload = multer({ //multer settings
                             storage: profile
                         }).single('file');
                    
@@ -414,7 +414,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //updated profile fields
     api.put('/update',function(req,res){
-        var id= clean(req.body._id,res,req),
+        const id= clean(req.body._id,res,req),
             address= clean(req.body.address,res,req),
             history= clean(req.body.history,res,req),
             fname= clean(req.body.fname,res,req),
@@ -517,7 +517,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //create an album
     api.post('/createAlbum/:id',(req,res)=>{
-        var id= clean(req.params.id,res,req),
+        const id= clean(req.params.id,res,req),
             name= clean(req.body.name,res,req),
             des= clean(req.body.description,res,req);
 
@@ -525,24 +525,24 @@ module.exports = (app,express,sanitizer,io,con)=>{
         //configuring multer settings
         User.findOne({_id:id},function(err,user){
 
-            var albm = multer.diskStorage({ //multers disk storage settings for profile images
+            const albm = multer.diskStorage({ //multers disk storage settings for profile images
                     destination: function (req, file, cb) {
                         cb(null, './album/')
                     },
                     filename: function (req, file, cb) {
-                        var datetimestamp = Date.now();
+                        const datetimestamp = Date.now();
                         cb(null, user._id + name + '.' + file.originalname.split('.')[file.originalname.split('.').length -1])
                     }
                 });
                    //creating a new instance of and passing in the storage settings
-                var upload = multer({ //multer settings
+                const upload = multer({ //multer settings
                             storage: albm
                     }).single('file');
 
                 return res.json({albm:albm.filename});
                 
                 //save record
-                var album = new Album({
+                const album = new Album({
                             name:albm.filename,
                             description:des,
                             userid:id,
@@ -564,7 +564,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
        //delete an album
     api.delete('/deleteAlbum/:album_id',function(req,res){
-        var id = clean(req.params.album_id,res,req);
+        const id = clean(req.params.album_id,res,req);
 
         //delete from the albums folder
 
@@ -579,7 +579,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //upload an image into an album
     api.post('/upload/:album',function(req,res){
-        var storage =   multer.diskStorage({
+        const storage =   multer.diskStorage({
                 destination: function (req, file, callback) {
                     callback(null, './public/album');
                 },
@@ -592,7 +592,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
                 }
             });
 
-        var upload = multer({ storage : storage }).array('file',10);
+        const upload = multer({ storage : storage }).array('file',10);
             
             upload(req,res,function(err) {
                 //  console.log(req.body);
@@ -604,14 +604,14 @@ module.exports = (app,express,sanitizer,io,con)=>{
                 console.log(req.body);
             });
 
-        //   var albumId = clean(req.body.albumid,res,req),
+        //   const albumId = clean(req.body.albumid,res,req),
         //  userId = clean(req.body.userid,res,req);
     });
 
 
      //delete an image in an album
     api.delete('/delete/:userid/:albumid/:imgid',(req,res)=>{
-        var albumId = clean(req.params.albumid,res,req),
+        const albumId = clean(req.params.albumid,res,req),
             userId = clean(req.params.userid,res,req),
             imgId = clean(req.params.imgid,res,req);
         
@@ -630,7 +630,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //load each persons profile page
     api.get('/profile/:id',function(req,res){
-        var id = clean(req.params.id,res,req);
+        const id = clean(req.params.id,res,req);
      
         //projection of what you want retrieved
         User.findOne({_id:id},'-pass')
@@ -668,12 +668,12 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //submit post
     api.post('/post',(req,res)=>{
-        var  name = clean(req.body.name,res,req),
+        const  name = clean(req.body.name,res,req),
             id = clean(req.body.id,res,req),
             pid = clean(req.body.pid,res,req),
             message = clean(req.body.message,res,req);
 
-        var post = new Post({
+        const post = new Post({
             name:name,
             userid:id,
             posterid:pid,
@@ -691,7 +691,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
                 if(err){
                     return res.json(err);
                 }
-                var img=image[0].profileImg;
+                const img=image[0].profileImg;
                     req.body.img=img;
                 return res.json({success:true,message:req.body});
             });
@@ -703,7 +703,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //retrieve post
     api.post('/posts',(req,res)=>{
-        var id =clean(req.body.id,res,req);
+        const id =clean(req.body.id,res,req);
 
         async.waterfall([
             function getPost(callback){
@@ -721,7 +721,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
                         if(err){
                             return res.json(err);
                         }
-                        var img=image[0].profileImg;
+                        const img=image[0].profileImg;
                         p.img=img;
                         posts.push(p);
                         funky();
@@ -740,7 +740,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //api for search
     api.post('/search',(req,res)=>{
-        var search = clean(req.body.q,res,req),
+        const search = clean(req.body.q,res,req),
             country_id = clean(req.body.country_id,res,req),
             city_id = clean(req.body.city_id,res,req),
             state_id = clean(req.body.state_id,res,req),
@@ -931,7 +931,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //api to pull contacts online
     api.post('/onlineContacts',function(req,res){
-        var id = clean(req.body.id,res,req),
+        const id = clean(req.body.id,res,req),
                 users=[];
 
         //getting buddies i added and confirmed
@@ -967,7 +967,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //api for updating service of a user
     api.post('/services',function(req,res){
-        var id = clean(req.body.userid,res,req),
+        const id = clean(req.body.userid,res,req),
             skill= clean(req.body.service,res,req);
         User.findOneAndUpdate({_id:id},{ $addToSet: { vendors:{name:skill}  } },function (err, user) {
             if(err){
@@ -979,7 +979,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //api to retrieve the services of a user
     api.post('/getServices',function(req,res){
-        var id = clean(req.params.userid,res,req);
+        const id = clean(req.params.userid,res,req);
         User.findOne({_id:id},'service _id',function (err, user) {
             if(err){
                 res.json(err);
@@ -990,7 +990,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
   //api for logout
     api.post('/logout',(req,res)=>{
-        var id = clean(req.body.id,res,req);
+        const id = clean(req.body.id,res,req);
         User.findOneAndUpdate({_id:id}, { $set:{ status:false}},function(err,user){
             if(err){
                 return res.json({success:false,message:"Please try again"});
@@ -1002,7 +1002,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //api to retrieve messages for a specific user
     api.post('/getMessages',(req,res)=>{
-           var  id = clean(req.body.id,res,req),
+           const  id = clean(req.body.id,res,req),
                 senderid = clean(req.body.fromid,res,req);
 
             Message.find({toid:id,read:"unread",fromid:senderid},function(req,res){
@@ -1012,7 +1012,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //api for unread message count for a specific user
     api.post('/count',(req,res)=>{
-        var id = clean(req.body.id,res,req);
+        const id = clean(req.body.id,res,req);
         Message.find({toid:id,read:"unread"}).count().exec(function(err,count){
             if(err){
                 console.log(err);
@@ -1023,7 +1023,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //api for checking if there a friend request
     api.post('/chkBudyRes',(req,res) =>{
-        var id = clean(req.body.id,res,req);
+        const id = clean(req.body.id,res,req);
        //query the contact list for friend request
         Contact.find({recid:id,status:0},function(err,request){
             res.json(request);
@@ -1032,7 +1032,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //api to delete services
     api.post('/deleteService',(req,res) =>{
-        var  id = clean(req.body.userid,res,req),
+        const  id = clean(req.body.userid,res,req),
             serviceName = clean(req.body.serviceName,res,req),
             serviceid = clean(req.body.serviceid,res,req);
 
@@ -1044,8 +1044,8 @@ module.exports = (app,express,sanitizer,io,con)=>{
     });
 
     api.post('/save/categories',(req,res)=>{
-        var name = req.body.name;
-        var category = new Category({
+        const name = req.body.name;
+        const category = new Category({
             name: name
         });
 
@@ -1063,7 +1063,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //check for unread messagess in inbox and mark ass read
     api.post('/markread',(req,res) => {
-        var id = clean(req.body.id,res,req),
+        const id = clean(req.body.id,res,req),
          userid = clean(req.body.userid,res,req);
 
         Message.update({$and:[{fromid:id},{toid:userid}],read:"unread"}, { $set:{ read:"read"}},function(err,user){
@@ -1076,7 +1076,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //read last message
     api.post('/checkinbox',(req,res) =>{
-        var id = clean(req.body.id,res,req),
+        const id = clean(req.body.id,res,req),
             userid = clean(req.body.userid,res,req);
 
         Message.find({$or:[{$and:[{fromid:id},{toid:userid}]},{$and:[{fromid:userid},{toid:id}]}]}).sort('-_id').limit(10).exec(function(err,msg){
@@ -1089,7 +1089,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //get all listings a vendor offers
     api.get('/listings/:id',(req,res)=>{
-        var id = clean(req.params.id,res,req);
+        const id = clean(req.params.id,res,req);
         Listing.find({user_id:id})
         .populate({ path: 'country',select:"name -_id"})
             .populate({ path: 'state', select: "name -_id"})
@@ -1113,7 +1113,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
     //save vendor listing
     api.post('/listing', (req, res) => {   
-        var title = clean(req.body.data.title, res, req),
+        const title = clean(req.body.data.title, res, req),
             category_id = clean(req.body.data.category_id, res, req),
             country_id = clean(req.body.data.country_id, res, req),
             state_id = clean(req.body.data.state_id, res, req),
@@ -1126,7 +1126,7 @@ module.exports = (app,express,sanitizer,io,con)=>{
 
             // Note upload image and get the path
             
-        var listing = new Listing({
+        const listing = new Listing({
             title: title,
             description: description,
             landmark: landmark,
@@ -1170,10 +1170,10 @@ module.exports = (app,express,sanitizer,io,con)=>{
         });
 
         socket.on('sendMsg',(data)=>{
-            var userto = data.toid;
+            const userto = data.toid;
 
             //save to db as read still check the logic here
-            var message = new Message({
+            const message = new Message({
                     toid:userto,
                     fromid:data.fromid,
                     fromuser:data.fromuser,
